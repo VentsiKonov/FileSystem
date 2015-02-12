@@ -1,6 +1,7 @@
 #include "FileSystem.h"
 #include <fstream>
 #include <iostream>
+#include <functional>
 FileSystem::FileSystem(std::string fileName) {
 	std::fstream file(fileName); 
 	fileManager = nullptr;
@@ -119,7 +120,7 @@ void FileSystem::appendText(std::string filePath, std::string data) {
 	
 	size_t dataSize = data.length(); // Size in bytes
 	const char* dataRaw = data.c_str();
-	std::pair<size_t, size_t> info = fileManager->saveData(dataRaw, dataSize, file->getId());
+	std::pair<size_t, size_t> info = fileManager->saveData(dataRaw, dataSize, file->getId(), file->getFragmentsCount());
 	file->addFragments(info.first, info.second);
 }
 
@@ -139,6 +140,25 @@ void FileSystem::exportFile(std::string filePath, std::string realFSPath) {
 
 
 	fileManager->exportFile(file->getId(), file->getStartPos(), file->getFragmentsCount(), realFSPath);
+}
+
+void FileSystem::exportFolder(std::string path, std::string realFSPath) {
+	List<std::string> cPath(parsePath(path));
+	if (cPath.Front() == fileStructure->getName()) {
+		cPath.PopFront();
+	}
+	Folder* folder = getFolder(cPath);
+	if (!folder)
+		throw std::exception(std::string("Cannot find requested folder: " + path).c_str());
+
+	std::function<void(size_t, size_t, size_t, std::string)> fp = 
+		std::bind(
+		&FragmentFileManager::exportFile, fileManager, 
+		std::placeholders::_1, std::placeholders::_2, 
+		std::placeholders::_3, std::placeholders::_4
+		);
+
+	folder->exportToFS(realFSPath, fp);
 }
 
 void FileSystem::moveFile(std::string filePath, std::string newFilePath) {
@@ -186,7 +206,17 @@ void FileSystem::deleteFile(std::string filePath) {
 }
 
 void FileSystem::deleteFolder(std::string path) {
-	// TODO
+	List<std::string> cPath(parsePath(path));
+	if (cPath.Front() == fileStructure->getName()) {
+		cPath.PopFront();
+	}
+	std::string folderName = cPath.PopBack();
+	Folder* containingFolder = getFolder(cPath);
+	if (!containingFolder)
+		throw std::exception(std::string("Cannot find requested folder: " + path).c_str());
+	std::function<void(size_t, size_t, size_t)> fp = std::bind(&FragmentFileManager::deleteFragments, fileManager, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+	containingFolder->getFolder(folderName)->deleteAllFiles(fp);
+	containingFolder->deleteFolder(folderName);
 }
 
 void FileSystem::rename(std::string entryPath, std::string newName) { // TODO: Fix for root

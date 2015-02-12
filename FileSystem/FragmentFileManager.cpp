@@ -1,5 +1,5 @@
 #include "FragmentFileManager.h"
-
+#include <io.h>
 FragmentFileManager::FragmentFileManager(std::string fileName){
 	file = std::fstream(fileName, std::ios::binary | std::ios::in | std::ios::out);
 	if (!file)
@@ -21,6 +21,7 @@ FragmentFileManager::FragmentFileManager(std::string fileName){
 	if (!file)
 		throw "File does not contain valid filesystem data!";
 
+	fragmentFileName = fileName;
 }
 
 void FragmentFileManager::saveToDisk(const Folder& rootFolder) {
@@ -52,12 +53,18 @@ std::streampos FragmentFileManager::getEmptyFragment(size_t startPos) {
 	return returnValue;
 }
 
-std::pair<size_t, size_t> FragmentFileManager::saveData(const char* data, size_t dataSizeInBytes, size_t fileID) {
+std::pair<size_t, size_t> FragmentFileManager::saveData(const char* data, size_t dataSizeInBytes, size_t fileID, size_t fragmentsExisting) {
 	size_t neededFragments = 1 + dataSizeInBytes / (FRAGMENT_SIZE - sizeof(size_t));
 	size_t size;
 	size_t startPos = writingPos;
+	size_t gPos = 32; // first fragment pos;
 	for (size_t i = 0; i < neededFragments; i++) {
-		file.seekp(writingPos, std::ios::beg);
+		if (fragmentsExisting > 0)
+			file.seekp(writingPos, std::ios::beg);
+		else {
+			gPos = getEmptyFragment(gPos);
+			file.seekp(gPos, std::ios::beg);
+		}
 		file.write((char*)&fileID, sizeof(fileID));
 		if (dataSizeInBytes - i * (FRAGMENT_SIZE - sizeof(size_t)) < (FRAGMENT_SIZE - sizeof(size_t))) {
 			size = dataSizeInBytes - i * (FRAGMENT_SIZE - sizeof(size_t));
@@ -70,7 +77,8 @@ std::pair<size_t, size_t> FragmentFileManager::saveData(const char* data, size_t
 		
 		file.seekp(file.tellp() + (std::streampos)(FRAGMENT_SIZE - size - sizeof(size_t)));
 
-		writingPos += (std::streampos)(sizeof(fileID) + FRAGMENT_SIZE);
+		if (gPos >= writingPos)
+			writingPos += (std::streampos)(sizeof(fileID) + FRAGMENT_SIZE);
 	}
 
 	return std::pair<size_t, size_t>(neededFragments, startPos);
@@ -95,8 +103,13 @@ void FragmentFileManager::deleteFragments(size_t fileID, size_t start, size_t fr
 	}
 	
 	file.clear();
-	file.seekg(0);
-	file.seekp(0);
+	do {
+		file.seekg(writingPos - (std::streampos)(FRAGMENT_SIZE + sizeof(id)));
+		file.read((char*)&id, sizeof(id));
+		if (id == nullID)
+			writingPos -= (std::streampos)(FRAGMENT_SIZE + sizeof(id));
+	} while (id == nullID);
+	file.clear();
 }
 
 size_t FragmentFileManager::getUid() {
@@ -112,7 +125,12 @@ Folder FragmentFileManager::loadRoot() {
 }
 
 FragmentFileManager::~FragmentFileManager() {
+	// Assure when this is called, the writer pointer of the file is at the end of valid data;
+	__int64 size = file.tellg();
 	file.close();
+	FILE* systemFile = fopen(fragmentFileName.c_str(), "r+"); // open file for update
+	
+	_chsize_s(_fileno(systemFile), size); // os-specific
 }
 
 void FragmentFileManager::exportFile(size_t fileID, size_t firstBlockPos, size_t fragmentsCount, std::string realFSPath) {

@@ -18,6 +18,7 @@ public:
 	void rename(std::string path, std::string newName);
 	void copyFile(std::string filePath, std::string newFilePath);
 	void importFile(std::string realFilePath, std::string filePath);
+	void exportFolder(std::string path, std::string realFSPath);
 
 private:
 	void operator=(const FileSystem&);

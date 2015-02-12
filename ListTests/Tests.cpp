@@ -147,15 +147,5 @@ private:
 			Assert::AreEqual(std::string("dsa"), newTable.get("asd"));
 		}
 
-		TEST_METHOD(TABLE_POP) {
-			HashTable<std::string, std::string> table(hashString);
-			table.put("string1", "value1");
-			table.put("asd", "dsa");
-			table.put("key", "value");
-
-			std::string value = table.pop();
-			Assert::AreEqual(2U, table.size());
-			Assert::AreEqual(std::string("value1"), value);
-		}
 	};
 }

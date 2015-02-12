@@ -2,7 +2,7 @@
 #include "Entry.hpp"
 #include "File.h"
 #include "List.hpp"
-
+#include <functional>
 class Folder : public Entry {
 public:
 	Folder(std::string name) : Entry(name) {}
@@ -25,7 +25,9 @@ public:
 	void addFolder(std::string name);
 	Folder* getFolder(std::string name);
 	File* getFile(std::string name);
-	List<size_t> getFilesIDs() const;
+	void clear();
+	void deleteAllFiles(std::function<void (size_t, size_t, size_t)> delFunc);
+	void exportToFS(std::string realFSPath, std::function<void(size_t, size_t, size_t, std::string)> fileExportFN);
 
 protected:
 	List<Folder*> folders;

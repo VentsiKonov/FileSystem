@@ -1,4 +1,5 @@
 #include "Folder.h"
+#include <iostream>
 
 Folder::Folder(const Folder& other) : Entry(other){
 	copyFrom(other);
@@ -12,8 +13,13 @@ Folder& Folder::operator=(const Folder& other) {
 void Folder::copyFrom(const Folder& other) {
 	if (this != &other) {
 		Entry::copyFrom(other); // TODO: Make clean copy - not like this;
-		folders = List<Folder*>(other.folders);
-		files = List<File*>(other.files);
+		clear();
+		for (List<File*>::Iterator i = other.files.Begin(); i != other.files.End(); ++i) {
+			files.PushBack(new File(**i));
+		}
+		for (List<Folder*>::Iterator i = other.folders.Begin(); i != other.folders.End(); ++i) {
+			folders.PushBack(new Folder(**i));
+		}
 	}
 
 }
@@ -37,12 +43,7 @@ Folder::Folder(std::istream& file) : Entry(file) {
 }
 
 Folder::~Folder() {
-	while (!files.IsEmpty()) {
-		delete files.PopFront();
-	}
-	while (!folders.IsEmpty()) {
-		delete folders.PopFront();
-	}
+	clear();
 }
 
 void Folder::saveToFile(std::ostream& file) const{
@@ -128,10 +129,33 @@ void Folder::deleteFolder(std::string name) {
 	delete folders.PopAt(c);
 }
 
-List<size_t> Folder::getFilesIDs() const {
-	List<size_t> ids;
-	for (List<File*>::Iterator i = files.Begin(); i != files.End(); ++i) {
-		ids.PushBack((*i)->getId());
+void Folder::clear() {
+	while (!files.IsEmpty()) {
+		delete files.PopFront();
 	}
-	return ids;
+	while (!folders.IsEmpty()) {
+		delete folders.PopFront();
+	}
+}
+
+void Folder::deleteAllFiles(std::function<void(size_t, size_t, size_t)> delFunc) {
+	for (List<File*>::Iterator i = files.Begin(); i != files.End(); ++i) {
+		delFunc((*i)->getId(), (*i)->getStartPos(), (*i)->getFragmentsCount());
+	}
+	for (List<Folder*>::Iterator i = folders.Begin(); i != folders.End(); ++i) {
+		(*i)->deleteAllFiles(delFunc);
+	}
+}
+
+void Folder::exportToFS(std::string realFSPath, std::function<void(size_t, size_t, size_t, std::string)> fileExportFN) {
+	//std::cout << "mkdir " << realFSPath << "\n";
+	system(std::string("mkdir " + realFSPath).c_str()); // OS-specific
+
+	for (List<File*>::Iterator i = files.Begin(); i != files.End(); ++i) {
+		fileExportFN((*i)->getId(), (*i)->getStartPos(), (*i)->getFragmentsCount(), realFSPath + "\\" + (*i)->getName());
+	}
+	
+	for (List<Folder*>::Iterator i = folders.Begin(); i != folders.End(); ++i) {
+		(*i)->exportToFS(realFSPath + "\\" + (*i)->name, fileExportFN);
+	}
 }
