@@ -11,6 +11,7 @@ public:
 	bool contains(const T& key) const;
 	G get(const T& key) const;
 	G remove(const T& key);
+	G pop(); // Awkward
 	void put(const T& key, const G& value);
 	size_t size() const;
 
@@ -130,4 +131,16 @@ G HashTable<T, G>::remove(const T& key) {
 	else
 		throw "Element not existing";
 
+}
+
+template <class T, class G>
+G HashTable<T, G>::pop() {
+	for (size_t i = 0; i < bucketsCount; i++) {
+		if (buckets[i].Size() > 0) {
+			--elements;
+			return buckets[i].PopFront().value;
+		}
+	}
+
+	throw "Hash table empty!";
 }
