@@ -77,7 +77,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CommandParser.cpp" />
     <ClCompile Include="File.cpp" />
     <ClCompile Include="FileSystem.cpp" />
     <ClCompile Include="Folder.cpp" />
@@ -85,7 +84,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="CommandParser.h" />
     <ClInclude Include="Entry.hpp" />
     <ClInclude Include="File.h" />
     <ClInclude Include="FileSystem.h" />
