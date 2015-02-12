@@ -1,5 +1,6 @@
 #pragma once
 #include "List.hpp"
+#include <iostream>
 template <class T, class G>
 class HashTable {
 public:
@@ -74,6 +75,7 @@ size_t HashTable<T, G>::size() const {
 template <class T, class G>
 G HashTable<T, G>::get(const T& key) const {
 	size_t hash = hashFN(key);
+
 	List<Entry> &bucket = buckets[hash % bucketsCount];
 	for (List<Entry>::Iterator i = bucket.Begin(); i != bucket.End(); ++i) {
 		if ((*i).key == key) {

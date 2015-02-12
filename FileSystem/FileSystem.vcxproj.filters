@@ -36,6 +36,9 @@
     <ClCompile Include="Folder.cpp">
       <Filter>Source Files\Structures</Filter>
     </ClCompile>
+    <ClCompile Include="CommandParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="FragmentFileManager.h">
@@ -58,6 +61,9 @@
     </ClInclude>
     <ClInclude Include="List.hpp">
       <Filter>Header Files\Structures</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandParser.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

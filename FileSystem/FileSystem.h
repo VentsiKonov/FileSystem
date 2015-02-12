@@ -4,8 +4,10 @@
 #include <string>
 class FileSystem {
 public:
-	FileSystem(std::string fileName);
+	FileSystem(const std::string& fileName);
 	~FileSystem();
+
+	bool deleteEntry(std::string path);
 
 	void createFolder(std::string path);
 	void createFile(std::string path);

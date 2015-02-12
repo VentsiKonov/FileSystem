@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <functional>
-FileSystem::FileSystem(std::string fileName) {
+FileSystem::FileSystem(const std::string& fileName) {
 	std::fstream file(fileName); 
 	fileManager = nullptr;
 	fileStructure = nullptr;
@@ -106,17 +106,15 @@ void FileSystem::printStructure(std::ostream& out) {
 
 void FileSystem::appendText(std::string filePath, std::string data) {
 	List<std::string> cPath(parsePath(filePath));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+	
 	std::string fileName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + filePath).c_str());
+		throw std::string("Cannot find requested folder: " + filePath);
 
 	File* file = containingFolder->getFile(fileName);
 	if (!file) 
-		throw std::exception(std::string("Cannot find requested file: " + filePath).c_str());
+		throw std::string("Cannot find requested file: " + filePath);
 	
 	size_t dataSize = data.length(); // Size in bytes
 	const char* dataRaw = data.c_str();
@@ -195,11 +193,11 @@ void FileSystem::deleteFile(std::string filePath) {
 	std::string fileName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + filePath).c_str());
+		throw std::string("Cannot find requested folder: " + filePath).c_str();
 
 	File* file = containingFolder->getFile(fileName);
 	if (!file)
-		throw std::exception(std::string("Cannot find requested file: " + filePath).c_str());
+		throw std::string("Cannot find requested file: " + filePath).c_str();
 
 	fileManager->deleteFragments(file->getId(), file->getStartPos(), file->getFragmentsCount());
 	containingFolder->deleteFile(fileName);
@@ -213,7 +211,7 @@ void FileSystem::deleteFolder(std::string path) {
 	std::string folderName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + path).c_str());
+		throw std::string("Cannot find requested folder: " + path).c_str();
 	std::function<void(size_t, size_t, size_t)> fp = std::bind(&FragmentFileManager::deleteFragments, fileManager, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
 	containingFolder->getFolder(folderName)->deleteAllFiles(fp);
 	containingFolder->deleteFolder(folderName);
@@ -221,21 +219,21 @@ void FileSystem::deleteFolder(std::string path) {
 
 void FileSystem::rename(std::string entryPath, std::string newName) { // TODO: Fix for root
 	List<std::string> cPath(parsePath(entryPath));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+	//if (cPath.Front() == fileStructure->getName()) {
+	//	cPath.PopFront();
+	//}
 
 	std::string entryName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + entryPath).c_str());
+		throw std::string("Cannot find requested folder: " + entryPath);
 
 	Entry* entry = containingFolder->getFolder(entryName);
 	if (!entry) {
 		entry = containingFolder->getFile(entryName);
 	}
 	if (!entry) {
-		throw std::exception(std::string("Cannot find requested resource: " + entryPath).c_str());
+		throw std::string("Cannot find requested resource: " + entryPath);
 
 	}
 	entry->rename(newName);
@@ -286,4 +284,21 @@ void FileSystem::importFile(std::string realFilePath, std::string filePath) {
 
 	std::pair<size_t, size_t> fileData = fileManager->importFile(realFilePath, file->getId());
 	file->addFragments(fileData.first, fileData.second);
+}
+
+bool FileSystem::deleteEntry(std::string path) { 
+	try {
+		deleteFile(path);
+		return true;
+	}
+	catch(const char*){
+		try {
+			deleteFolder(path);
+			return true;
+		}
+		catch (const char*) {
+			return false;
+		}
+	}
+	
 }
