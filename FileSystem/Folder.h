@@ -1,7 +1,8 @@
 #pragma once
 #include "Entry.hpp"
-#include "File.h"
 #include "List.hpp"
+#include "File.h"
+#include "BST.hpp"
 #include <functional>
 class Folder : public Entry {
 public:
@@ -30,7 +31,7 @@ public:
 	void exportToFS(std::string realFSPath, std::function<void(size_t, size_t, size_t, std::string)> fileExportFN);
 
 protected:
-	List<Folder*> folders;
-	List<File*> files;
+	BST<std::string, Folder*> folders;
+	BST<std::string, File*> files;
 
 };

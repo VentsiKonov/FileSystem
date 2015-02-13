@@ -76,9 +76,13 @@ void FileSystem::createFolder(std::string path) {
 	Folder* containingFolder = getFolder(cPath);
 	
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + path).c_str());
-
-	containingFolder->addFolder(folderName);
+		throw std::string("Cannot find requested folder: " + path);
+	try {
+		containingFolder->addFolder(folderName);
+	}
+	catch (const char* ex) {
+		throw std::string(ex);
+	}
 
 }
 
@@ -88,9 +92,13 @@ void FileSystem::createFile(std::string path) {
 	std::string fileName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + path).c_str());
-
-	containingFolder->addFile(fileName, fileManager->getUid());
+		throw std::string("Cannot find requested folder: " + path);
+	try {
+		containingFolder->addFile(fileName, fileManager->getUid());
+	}
+	catch (const char* ex) {
+		throw std::string(ex);
+	}
 }
 
 void FileSystem::printStructure(std::ostream& out) {

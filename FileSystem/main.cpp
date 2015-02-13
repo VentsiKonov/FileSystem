@@ -48,8 +48,13 @@ void mainLoop(FileSystem& fs) {
 				if (params.IsEmpty())
 					cmdParser.getHelp(cmd);
 				else {
-					fs.createFile(params.PopFront());
-					std::cout << "File created!";
+					try {
+						fs.createFile(params.PopFront());
+						std::cout << "File created!";
+					}
+					catch (std::string ex) {
+						std::cout << ex;
+					}
 				}
 				break;
 			case C::deleteEntry:
@@ -68,8 +73,13 @@ void mainLoop(FileSystem& fs) {
 					std::cout << cmdParser.getHelp(cmd);
 				}
 				else {
-					fs.createFolder(params.PopFront());
-					std::cout << "Directory created successfully!";
+					try {
+						fs.createFolder(params.PopFront());
+						std::cout << "Directory created successfully!";
+					}
+					catch (std::string ex) {
+						std::cout << ex;
+					}
 				}
 				break;
 
@@ -145,32 +155,24 @@ void mainLoop(FileSystem& fs) {
 }
 
 int main() {
-	//std::cout << "Enter the relative or absolute path to your filesystem file:\n";
-	//char input[100];
-	//
-	//bool activeMode = false;
-	//while (!activeMode) {
-	//	try {
-	//		std::cin.getline(input, 100);
-	//		FileSystem fs(input);
-	//		activeMode = true;
-	//		//fs.printStructure(std::cout);
-	//		mainLoop(fs);
-	//
-	//	}
-	//	catch (std::exception ex) {
-	//		std::cout << ex.what() << "\n";
-	//		activeMode = false;
-	//	}
-	//}
-	BST<int, int> tree;
-	for (size_t i = 0; i < 20; i++) {
-		tree.insert(i, (i + 5) % 10);
+	std::cout << "Enter the relative or absolute path to your filesystem file:\n";
+	char input[100];
+	
+	bool activeMode = false;
+	while (!activeMode) {
+		try {
+			std::cin.getline(input, 100);
+			FileSystem fs(input);
+			activeMode = true;
+			//fs.printStructure(std::cout);
+			mainLoop(fs);
+	
+		}
+		catch (std::exception ex) {
+			std::cout << ex.what() << "\n";
+			activeMode = false;
+		}
 	}
-
-	for (BST<int, int>::Iterator i = tree.begin(); i != tree.end(); ++i) {
-		std::cout << *i;
-	}
-
+	
 	return 0;
 }
