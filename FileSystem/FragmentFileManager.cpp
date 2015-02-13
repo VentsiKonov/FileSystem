@@ -199,6 +199,9 @@ std::pair<size_t, size_t> FragmentFileManager::copyFragments(size_t fileID, size
 
 std::pair<size_t, size_t> FragmentFileManager::importFile(std::string filePath, size_t fileID) {
 	std::ifstream input(filePath, std::ios::binary);
+	if (!file.good()) {
+		throw std::string("Invalid file: " + filePath);
+	}
 	input.seekg(0, std::ios::end);
 	size_t dataSize = input.tellg();
 	input.seekg(0, std::ios::beg);
@@ -207,7 +210,7 @@ std::pair<size_t, size_t> FragmentFileManager::importFile(std::string filePath, 
 	size_t startPos;
 	size_t currentFragmentSize;
 	char* data = new char[FRAGMENT_SIZE];
-	for (size_t i = 0; i < neededFragments; i++) {
+	for (size_t i = 0; i < neededFragments && input.good(); i++) {
 		empty = getEmptyFragment(empty + (std::streampos)(FRAGMENT_SIZE + sizeof(size_t)));
 		if (empty >= writingPos)
 			writingPos += FRAGMENT_SIZE + sizeof(size_t);

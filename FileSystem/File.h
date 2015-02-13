@@ -10,7 +10,7 @@ public:
 
 	virtual void copyFrom(const File& other);
 
-	virtual void getInfo(std::ostream& out);
+	virtual void getInfo(std::ostream& out, size_t fragmentSize);
 
 	virtual void saveToFile(std::ostream& file) const;
 

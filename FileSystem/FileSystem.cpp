@@ -6,29 +6,26 @@ FileSystem::FileSystem(const std::string& fileName) {
 	std::fstream file(fileName); 
 	fileManager = nullptr;
 	fileStructure = nullptr;
-	try {
-		if (!file) {
-			std::ofstream create(fileName); // Creates the file
-			create.close();
-			fileManager = new FragmentFileManager(fileName);
-			fileStructure = new Folder("root");
-		}
-		else {
-			fileManager = new FragmentFileManager(fileName);
-			try {
-				fileStructure = new Folder(fileManager->loadRoot());
-			}
-			catch (std::exception ex) {
-				std::cerr << ex.what();
-				fileStructure = new Folder("root");
-			}
-		}
+	if (!file) {
+		std::ofstream create(fileName); // Creates the file
+		create.close();
 		file.close();
+		fileManager = new FragmentFileManager(fileName);
+		fileStructure = new Folder("root");
 	}
-	catch (std::exception ex) {
-		delete fileManager;
-		delete fileStructure;
-		throw;
+	else {
+		file.close();
+		fileManager = new FragmentFileManager(fileName);
+		try {
+			fileStructure = new Folder(fileManager->loadRoot());
+		}
+		catch (std::exception ex) {
+			std::cerr << ex.what();
+			delete fileManager;
+			delete fileStructure;
+			throw;
+			//fileStructure = new Folder("root");
+		}
 	}
 
 }
@@ -74,9 +71,7 @@ Folder* FileSystem::getFolder(List<std::string> cPath) {
 
 void FileSystem::createFolder(std::string path) {
 	List<std::string> cPath(parsePath(path));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	std::string folderName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	
@@ -89,9 +84,7 @@ void FileSystem::createFolder(std::string path) {
 
 void FileSystem::createFile(std::string path) {
 	List<std::string> cPath(parsePath(path));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	std::string fileName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
@@ -124,17 +117,15 @@ void FileSystem::appendText(std::string filePath, std::string data) {
 
 void FileSystem::exportFile(std::string filePath, std::string realFSPath) {
 	List<std::string> cPath(parsePath(filePath));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	std::string fileName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + filePath).c_str());
+		throw std::string("Cannot find requested folder: " + filePath);
 
 	File* file = containingFolder->getFile(fileName);
 	if (!file)
-		throw std::exception(std::string("Cannot find requested file: " + filePath).c_str());
+		throw std::string("Cannot find requested file: " + filePath);
 
 
 	fileManager->exportFile(file->getId(), file->getStartPos(), file->getFragmentsCount(), realFSPath);
@@ -142,12 +133,10 @@ void FileSystem::exportFile(std::string filePath, std::string realFSPath) {
 
 void FileSystem::exportFolder(std::string path, std::string realFSPath) {
 	List<std::string> cPath(parsePath(path));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	Folder* folder = getFolder(cPath);
 	if (!folder)
-		throw std::exception(std::string("Cannot find requested folder: " + path).c_str());
+		throw std::string("Cannot find requested folder: " + path);
 
 	std::function<void(size_t, size_t, size_t, std::string)> fp = 
 		std::bind(
@@ -162,9 +151,7 @@ void FileSystem::exportFolder(std::string path, std::string realFSPath) {
 void FileSystem::moveFile(std::string filePath, std::string newFilePath) {
 	List<std::string> cPath(parsePath(filePath));
 	List<std::string> cNewPath(parsePath(newFilePath));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	if (cNewPath.Front() == fileStructure->getName()) {
 		cNewPath.PopFront();
 	}
@@ -187,9 +174,7 @@ void FileSystem::moveFile(std::string filePath, std::string newFilePath) {
 
 void FileSystem::deleteFile(std::string filePath) {
 	List<std::string> cPath(parsePath(filePath));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	std::string fileName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
@@ -205,9 +190,7 @@ void FileSystem::deleteFile(std::string filePath) {
 
 void FileSystem::deleteFolder(std::string path) {
 	List<std::string> cPath(parsePath(path));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	std::string folderName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
@@ -219,9 +202,6 @@ void FileSystem::deleteFolder(std::string path) {
 
 void FileSystem::rename(std::string entryPath, std::string newName) { // TODO: Fix for root
 	List<std::string> cPath(parsePath(entryPath));
-	//if (cPath.Front() == fileStructure->getName()) {
-	//	cPath.PopFront();
-	//}
 
 	std::string entryName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
@@ -242,9 +222,7 @@ void FileSystem::rename(std::string entryPath, std::string newName) { // TODO: F
 void FileSystem::copyFile(std::string filePath, std::string newFilePath) {
 	List<std::string> cPath(parsePath(filePath));
 	List<std::string> cNewPath(parsePath(newFilePath));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	std::string fileName = cPath.PopBack();
 	std::string newFileName = cNewPath.PopBack();
 
@@ -269,18 +247,16 @@ void FileSystem::copyFile(std::string filePath, std::string newFilePath) {
 
 void FileSystem::importFile(std::string realFilePath, std::string filePath) {
 	List<std::string> cPath(parsePath(filePath));
-	if (cPath.Front() == fileStructure->getName()) {
-		cPath.PopFront();
-	}
+
 	std::string fileName = cPath.PopBack();
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + filePath).c_str());
+		throw std::string("Cannot find requested folder: " + filePath);
 
 	containingFolder->addFile(fileName, fileManager->getUid());
 	File* file = containingFolder->getFile(fileName);
 	if (!file)
-		throw std::exception(std::string("Cannot find requested file: " + filePath).c_str());
+		throw std::string("Cannot find requested file: " + filePath);
 
 	std::pair<size_t, size_t> fileData = fileManager->importFile(realFilePath, file->getId());
 	file->addFragments(fileData.first, fileData.second);
@@ -301,4 +277,20 @@ bool FileSystem::deleteEntry(std::string path) {
 		}
 	}
 	
+}
+
+bool FileSystem::exportEntry(std::string path, std::string realFSPath) {
+	try {
+		exportFile(path, realFSPath);
+		return true;
+	}
+	catch (std::string ex) {
+		try {
+			exportFolder(path, realFSPath);
+			return true;
+		}
+		catch (std::string ex) {
+			return false;
+		}
+	}
 }

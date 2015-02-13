@@ -16,13 +16,15 @@ public:
 		deleteEntry,
 		rename,
 		structure,
-		INVALID,
 		EXIT,
-		HELP
+		HELP,
+		INVALID
 	};
 
 	static CommandParser& getInstance();
 	Command parse(std::string cmd);
+
+	std::string getHelp(const Command& cmd);
 
 private:
 	CommandParser();

@@ -12,7 +12,7 @@ Folder& Folder::operator=(const Folder& other) {
 
 void Folder::copyFrom(const Folder& other) {
 	if (this != &other) {
-		Entry::copyFrom(other); // TODO: Make clean copy - not like this;
+		Entry::copyFrom(other); 
 		clear();
 		for (List<File*>::Iterator i = other.files.Begin(); i != other.files.End(); ++i) {
 			files.PushBack(new File(**i));

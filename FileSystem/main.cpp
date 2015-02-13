@@ -2,6 +2,7 @@
 #include "FileSystem.h"
 #include "CommandParser.h"
 #include "List.hpp"
+#include "BST.hpp"
 
 void parseInput(const char command[], List<std::string>& output) {
 	size_t length = strlen(command);
@@ -17,49 +18,35 @@ void parseInput(const char command[], List<std::string>& output) {
 	output.PushBack(part);
 }
 
-void printHelp() {
-	std::cout << "help\n";
-}
-
-void parametersNeeded() {
-	std::cout << "More parameters needed!";
-}
-
 void invalidCommandMessage() {
 	std::cout << "Invalid command!\n";
 	std::cout << "Type 'help' for list of commands\n";
 }
 
-int main() {
+void mainLoop(FileSystem& fs) {
 	typedef CommandParser::Command C;
-	std::cout << "Enter the relative or absolute path to your filesystem file:\n";
 	char input[100];
-	
-	std::cin.getline(input, 100);
-
-	FileSystem fs(input);
-	
-	fs.printStructure(std::cout);
-
 	CommandParser::Command cmd;
+	CommandParser& cmdParser = CommandParser::getInstance();
 	List<std::string> params;
 	do {
-		std::cout << "\nroot> ";
+		std::cout << "\n~root> ";
 		std::cin.sync();
 		std::cin.clear();
 		std::cin.get(input, 100);
 		parseInput(input, params);
-		cmd = CommandParser::getInstance().parse(params.PopFront());
+		
+		cmd = cmdParser.parse(params.PopFront());
 		switch (cmd) {
 			case C::INVALID:
 				invalidCommandMessage();
 				break;
 			case C::HELP:
-				printHelp();
+				std::cout << cmdParser.getHelp(cmd);
 				break;
 			case C::mkfile:
 				if (params.IsEmpty())
-					parametersNeeded();
+					cmdParser.getHelp(cmd);
 				else {
 					fs.createFile(params.PopFront());
 					std::cout << "File created!";
@@ -67,7 +54,7 @@ int main() {
 				break;
 			case C::deleteEntry:
 				if (params.IsEmpty())
-					parametersNeeded();
+					std::cout << cmdParser.getHelp(cmd);
 				else {
 					if (fs.deleteEntry(params.PopFront()))
 						std::cout << "Deleted successfully!";
@@ -78,7 +65,7 @@ int main() {
 
 			case C::mkdir:
 				if (params.IsEmpty()) {
-					parametersNeeded();
+					std::cout << cmdParser.getHelp(cmd);
 				}
 				else {
 					fs.createFolder(params.PopFront());
@@ -88,11 +75,11 @@ int main() {
 
 			case C::rename:
 				if (params.Size() < 2) {
-					parametersNeeded();
+					std::cout << cmdParser.getHelp(cmd);
 				}
 				else {
 					try {
-						fs.rename(params.PopFront(), params.PopFront());
+						fs.rename(params.PopBack(), params.PopFront());
 						std::cout << "Renamed successfully!";
 					}
 					catch (std::string e) {
@@ -103,7 +90,7 @@ int main() {
 
 			case C::appendText:
 				if (params.Size() < 2) {
-					parametersNeeded();
+					std::cout << cmdParser.getHelp(cmd);
 				}
 				else {
 					try {
@@ -119,14 +106,71 @@ int main() {
 					}
 				}
 				break;
+			case C::importFile:
+				if (params.Size() < 2) {
+					std::cout << cmdParser.getHelp(cmd);
+				}
+				else {
+					try {
+						fs.importFile(params.PopFront(), params.PopFront());
+						std::cout << "Imported successfully!";
+					}
+					catch (std::string ex) {
+						std::cout << ex;
+					}
+				}
+				break;
+
+			case C::exportToFS:
+				if (params.Size() < 2) {
+					std::cout << cmdParser.getHelp(cmd);
+				}
+				else {
+					if (fs.exportEntry(params.PopFront(), params.PopFront())) {
+						std::cout << "Export successfull!";
+					}
+					else {
+						std::cout << "Export unsuccessfull! Check parameters!";
+					}
+				}
+				break;
 			case C::structure:
 				fs.printStructure(std::cout);
 				break;
 
 		}
 		params.Clear();
-		
+
 	} while (cmd != C::EXIT);
+}
+
+int main() {
+	//std::cout << "Enter the relative or absolute path to your filesystem file:\n";
+	//char input[100];
+	//
+	//bool activeMode = false;
+	//while (!activeMode) {
+	//	try {
+	//		std::cin.getline(input, 100);
+	//		FileSystem fs(input);
+	//		activeMode = true;
+	//		//fs.printStructure(std::cout);
+	//		mainLoop(fs);
+	//
+	//	}
+	//	catch (std::exception ex) {
+	//		std::cout << ex.what() << "\n";
+	//		activeMode = false;
+	//	}
+	//}
+	BST<int, int> tree;
+	for (size_t i = 0; i < 20; i++) {
+		tree.insert(i, (i + 5) % 10);
+	}
+
+	for (BST<int, int>::Iterator i = tree.begin(); i != tree.end(); ++i) {
+		std::cout << *i;
+	}
 
 	return 0;
 }

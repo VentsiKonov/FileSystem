@@ -15,9 +15,6 @@ File::File(const File& other) : Entry(other) {
 }
 
 void File::copyFrom(const File& other) {
-	// Independent from real files!
-	// If copy c-tor is used, it is assumed the old file in the tree will be removed leaving the new one as unique by id!
-
 	if (this != &other) {
 		Entry::copyFrom(other);
 		fragmentsCount = other.fragmentsCount;
@@ -26,7 +23,7 @@ void File::copyFrom(const File& other) {
 	}
 }
 
-void File::getInfo(std::ostream& out) {
+void File::getInfo(std::ostream& out, size_t fragmentSize) {
 	Entry::getInfo(out);
 	out << '\n';
 	out << "\tSize: " << fragmentsCount * 32 << " bytes.";

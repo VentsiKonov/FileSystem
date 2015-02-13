@@ -2,6 +2,7 @@
 #include "CppUnitTest.h"
 #include "../FileSystem/List.hpp"
 #include "../FileSystem/HashTable.hpp"
+#include "../FileSystem/BST.hpp"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -147,5 +148,68 @@ private:
 			Assert::AreEqual(std::string("dsa"), newTable.get("asd"));
 		}
 
+	};
+
+	TEST_CLASS(BST_Tests) {
+		TEST_METHOD(BST_Insert) {
+			BST<std::string, int> tree;
+			Assert::AreEqual(0U, tree.size());
+			tree.insert("asd", 5);
+			Assert::AreEqual(1U, tree.size());
+
+		}
+
+		TEST_METHOD(BST_GET) {
+			BST<std::string, int> tree;
+			tree.insert("asd", 5);
+			int num = tree.get("asd");
+
+			Assert::AreEqual(5, num);
+		}
+
+		TEST_METHOD(BST_GETMultiple) {
+			BST<std::string, int> tree;
+			std::string s;
+			for (size_t i = 0; i < 20; i++) {
+				s = (char)(i + 65);
+				tree.insert(s, i);
+			}
+			s = (char)(70);
+			Assert::AreEqual(5, tree.get(s));
+		}
+
+		TEST_METHOD(BST_Remove) {
+			BST<std::string, int> tree;
+			std::string s;
+			for (size_t i = 0; i < 20; i++) {
+				s = (char)(i + 65);
+				tree.insert(s, i);
+			}
+			
+			s = (char)(70);
+			tree.remove(s);
+			Assert::AreEqual(19U, tree.size());
+			bool exception = false;
+			try {
+				tree.get(s);
+			}
+			catch (const char* ex) {
+				exception = true;
+			}
+			Assert::IsTrue(exception);
+		}
+
+		TEST_METHOD(BST_Iterator) {
+			BST<int, int> tree;
+			for (size_t i = 0; i < 20; i++) {
+
+				tree.insert(i, (i + 5)%10);
+			}
+
+			for (BST<int, int>::Iterator i = tree.begin(); i != tree.end(); ++i) {
+				std::cout << *i;
+			}
+			// Makes sure no exceptions are thrown, nothing more;
+		}
 	};
 }
