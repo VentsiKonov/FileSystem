@@ -268,8 +268,13 @@ void FileSystem::importFile(std::string realFilePath, std::string filePath) {
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
 		throw std::string("Cannot find requested folder: " + filePath);
+	try {
+		containingFolder->addFile(fileName, fileManager->getUid());
 
-	containingFolder->addFile(fileName, fileManager->getUid());
+	}
+	catch (const char* ex) {
+		throw std::string("File with this name already exists!");
+	}
 	File* file = containingFolder->getFile(fileName);
 	if (!file)
 		throw std::string("Cannot find requested file: " + filePath);

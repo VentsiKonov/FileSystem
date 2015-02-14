@@ -135,6 +135,8 @@ FragmentFileManager::~FragmentFileManager() {
 
 void FragmentFileManager::exportFile(size_t fileID, size_t firstBlockPos, size_t fragmentsCount, std::string realFSPath) {
 	std::ofstream output(realFSPath, std::ios::binary); // Open new file for writing
+	if (!output)
+		throw std::string("Cannot open file for output!");
 	file.seekg(firstBlockPos, std::ios::beg);
 	size_t id, size;
 	char* data = new char[FRAGMENT_SIZE]; // temporary 'buffer' for the data
@@ -199,15 +201,15 @@ std::pair<size_t, size_t> FragmentFileManager::copyFragments(size_t fileID, size
 
 std::pair<size_t, size_t> FragmentFileManager::importFile(std::string filePath, size_t fileID) {
 	std::ifstream input(filePath, std::ios::binary); // open file for reading
-	if (!file.good()) {
+	if (!input.good()) {
 		throw std::string("Invalid file: " + filePath);
 	}
 	input.seekg(0, std::ios::end);
-	size_t dataSize = input.tellg(); // get the size in bytes of the file
+	std::streampos dataSize = input.tellg(); // get the size in bytes of the file
 	input.seekg(0, std::ios::beg);
 	size_t neededFragments = 1 + dataSize / (FRAGMENT_SIZE - sizeof(size_t)); // sizeof(size_t) is the id of the fragment which is stored right before the fragment
 	std::streampos empty = 32; // the initial value of 'writingPos' in case this is the first file in out system
-	size_t startPos;
+	std::streampos startPos;
 	size_t currentFragmentSize;
 	char* data = new char[FRAGMENT_SIZE];
 	for (size_t i = 0; i < neededFragments && input.good(); i++) {
@@ -219,8 +221,8 @@ std::pair<size_t, size_t> FragmentFileManager::importFile(std::string filePath, 
 			startPos = empty;
 
 		// keep track of where in the file we are
-		if (dataSize - i*(FRAGMENT_SIZE - sizeof(size_t)) < (FRAGMENT_SIZE - sizeof(size_t))) {
-			currentFragmentSize = dataSize - i*(FRAGMENT_SIZE - sizeof(size_t));
+		if (dataSize - (std::streampos)i*(FRAGMENT_SIZE - sizeof(size_t)) < (FRAGMENT_SIZE - sizeof(size_t))) {
+			currentFragmentSize = dataSize - (std::streampos)i*(FRAGMENT_SIZE - sizeof(size_t));
 		}
 		else {
 			currentFragmentSize = FRAGMENT_SIZE - sizeof(size_t);

@@ -8,12 +8,18 @@
 void parseInput(const char command[], List<std::string>& output) {
 	size_t length = strlen(command);
 	std::string part;
+	bool qMark = false;
 	for (size_t i = 0; i < length; ++i) {
-		if (command[i] == ' ') {
+		if (command[i] == '\'' || command[i] == '"') {
+			qMark = !qMark;
+			continue;
+		}
+		if (!qMark && command[i] == ' ') {
 			output.PushBack(part);
 			part = "";
 			continue;
 		}
+		
 		part += command[i];
 	}
 	output.PushBack(part);
