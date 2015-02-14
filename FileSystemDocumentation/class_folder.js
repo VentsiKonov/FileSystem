@@ -1,0 +1,26 @@
+var class_folder =
+[
+    [ "Folder", "class_folder.html#a69ca1adc04ca11fa32f336b3d1326bfd", null ],
+    [ "Folder", "class_folder.html#aaed2f9c30de483b7a6d6be765a4b90b8", null ],
+    [ "Folder", "class_folder.html#a7be8449ff8dda2ef5b1448229dd1f605", null ],
+    [ "~Folder", "class_folder.html#a7b9eaf0f340d5275809494685b0a3e1d", null ],
+    [ "addFile", "class_folder.html#a6fefd0c00b4cffa9fa50119482ab872e", null ],
+    [ "addFile", "class_folder.html#af9aba2368db9413043700f677492a124", null ],
+    [ "addFolder", "class_folder.html#a9f2bc4f3ce7c499665e00cacfbf7cfc5", null ],
+    [ "addFolder", "class_folder.html#ad49a379ebbc8ee2cdfaa717f45ed43bb", null ],
+    [ "clear", "class_folder.html#a2f697ffa83443387bed62da6c350b382", null ],
+    [ "copyFrom", "class_folder.html#ac1e330517e2d30af94dbfab5faca206c", null ],
+    [ "deleteAllFiles", "class_folder.html#a49b7f8334fa6ac00237716e446a38313", null ],
+    [ "deleteFile", "class_folder.html#a8fd760aacebcaa258500c37783fea643", null ],
+    [ "deleteFolder", "class_folder.html#a55fcc433af6e0b674986a9abf77f63af", null ],
+    [ "exportToFS", "class_folder.html#a5bd4d234f90e3163ccfa6d8dc2b7d3c5", null ],
+    [ "getFile", "class_folder.html#a8c4998394090b4a6bcd3f1ea1f9cba8f", null ],
+    [ "getFolder", "class_folder.html#a76059c4e6ceef88dbd53eb4e1c85632a", null ],
+    [ "getInfo", "class_folder.html#abcda78747205bf4d1ea51073fcb1dc0f", null ],
+    [ "operator=", "class_folder.html#ac8cecc9965ca73bbb5721e478c403f37", null ],
+    [ "printContents", "class_folder.html#a40c4c9991614f97c9cbb9d3b5a695738", null ],
+    [ "removeFolder", "class_folder.html#a9c10dc263ab57eab69ec240c7b1d6f14", null ],
+    [ "saveToFile", "class_folder.html#afce978e0da31a7cd575c762cab3f552f", null ],
+    [ "files", "class_folder.html#acf4763e022456027b8b12a68e1ac7414", null ],
+    [ "folders", "class_folder.html#a89c8640f47b92aca4f4273647a5eae93", null ]
+];
