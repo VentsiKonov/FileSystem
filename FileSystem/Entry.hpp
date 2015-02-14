@@ -16,7 +16,7 @@ public:
 		size_t size;
 		file.read((char*)&size, sizeof(size));
 		if (size > 50) {
-			throw std::exception("Unexpected entry name length!");
+			throw std::string("Unexpected entry name length!");
 		}
 		char* nameBuf = new char[size + 1];
 		file.read(nameBuf, size);

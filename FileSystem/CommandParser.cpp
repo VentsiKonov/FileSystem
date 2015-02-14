@@ -72,10 +72,10 @@ std::string CommandParser::getHelp(const Command& cmd) {
 			help = "mkfile 'path-to-dir/name'\nCreates an empty file with name 'name' in the 'path-to-dir' directory.\n";
 			break;
 		case Command::moved:
-			help = "moved 'new-path/name' 'path-to-directory'\nMoves the 'path-to-directory' directory and all files in the 'new-path' with name 'name'.\n";
+			help = "moved 'path-to-directory' 'new-path/name'\nMoves the 'path-to-directory' directory and all files in the 'new-path' with name 'name'.\n";
 			break;
 		case Command::movef:
-			help = "movef 'new-path' 'path-to-file'\nMoves the file to an existing directory.\n";
+			help = "movef 'path-to-file' 'new-path'\nMoves the file to an existing directory.\n";
 			break;
 		case Command::rename:
 			help = "rnm 'path-to-entry' 'new-name'\nRenames the entry to the given name. \n";

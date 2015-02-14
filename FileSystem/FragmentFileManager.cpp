@@ -2,8 +2,10 @@
 #include <io.h>
 FragmentFileManager::FragmentFileManager(std::string fileName){
 	file = std::fstream(fileName, std::ios::binary | std::ios::in | std::ios::out);
-	if (!file)
+	if (!file) {
+		file.close();
 		throw "Cannot open filesystem file! (" + fileName + ")";
+	}
 
 	file.seekg(0, std::ios::end);
 	if (file.tellg() > sizeof(FRAGMENT_SIZE) + sizeof(uid) + sizeof(treeStartPos)) { // Assure not entirely new file
@@ -18,8 +20,10 @@ FragmentFileManager::FragmentFileManager(std::string fileName){
 		FRAGMENT_SIZE = 100;
 		uid = 1;
 	}
-	if (!file)
+	if (!file) {
+		file.close();
 		throw "File does not contain valid filesystem data!";
+	}
 
 	fragmentFileName = fileName;
 }
@@ -107,7 +111,7 @@ void FragmentFileManager::deleteFragments(size_t fileID, size_t start, size_t fr
 		file.read((char*)&id, sizeof(id));
 		if (id == nullID)
 			writingPos -= (std::streampos)(FRAGMENT_SIZE + sizeof(id));
-	} while (id == nullID);
+	} while (id == nullID && writingPos > 32); // 32 is the initial leftmost position of writingPos
 	file.clear();
 }
 
@@ -118,10 +122,17 @@ size_t FragmentFileManager::getUid() {
 Folder FragmentFileManager::loadRoot() {
 	// treeStartPos is read in the constructor opening the filesystem file.
 	if (treeStartPos < sizeof(FRAGMENT_SIZE) + sizeof(uid) + sizeof(treeStartPos)) {
-		throw std::exception("Invalid file structure data!");
+		file.close();
+		throw std::string("Invalid file structure data!");
 	}
 	file.seekg(treeStartPos);
-	return Folder(file);
+	try { 
+		return Folder(file);
+	}
+	catch (std::string) {
+		file.close(); // Only because the logic guarantees we will not be using this file.
+		throw;
+	}
 }
 
 FragmentFileManager::~FragmentFileManager() {

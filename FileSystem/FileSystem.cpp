@@ -22,8 +22,8 @@ FileSystem::FileSystem(const std::string& fileName) {
 		try {
 			fileStructure = new Folder(fileManager->loadRoot());
 		}
-		catch (std::exception ex) {
-			std::cerr << ex.what();
+		catch (std::string ex) {
+			std::cerr << ex;
 			delete fileManager;
 			delete fileStructure;
 			throw;
@@ -244,15 +244,15 @@ void FileSystem::copyFile(std::string filePath, std::string newFilePath) {
 
 	Folder* containingFolder = getFolder(cPath);
 	if (!containingFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + filePath).c_str());
+		throw std::string("Cannot find requested folder: " + filePath);
 
 	Folder* newFolder = getFolder(cNewPath);
 	if (!newFolder)
-		throw std::exception(std::string("Cannot find requested folder: " + newFilePath).c_str());
+		throw std::string("Cannot find requested folder: " + newFilePath);
 
 	File* file = containingFolder->getFile(fileName);
 	if (!file)
-		throw std::exception(std::string("Cannot find requested file: " + filePath).c_str());
+		throw std::string("Cannot find requested file: " + filePath);
 
 	newFolder->addFile(newFileName, fileManager->getUid());
 	File* newFile = newFolder->getFile(newFileName);
@@ -278,9 +278,15 @@ void FileSystem::importFile(std::string realFilePath, std::string filePath) {
 	File* file = containingFolder->getFile(fileName);
 	if (!file)
 		throw std::string("Cannot find requested file: " + filePath);
+	try {
+		std::pair<size_t, size_t> fileData = fileManager->importFile(realFilePath, file->getId());
+		file->addFragments(fileData.first, fileData.second);
 
-	std::pair<size_t, size_t> fileData = fileManager->importFile(realFilePath, file->getId());
-	file->addFragments(fileData.first, fileData.second);
+	}
+	catch (std::string ex) {
+		containingFolder->deleteFile(file->getName());
+		throw;
+	}
 }
 
 bool FileSystem::deleteEntry(std::string path) { 

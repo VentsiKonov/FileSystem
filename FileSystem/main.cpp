@@ -15,14 +15,16 @@ void parseInput(const char command[], List<std::string>& output) {
 			continue;
 		}
 		if (!qMark && command[i] == ' ') {
-			output.PushBack(part);
+			if (part != "")
+				output.PushBack(part);
 			part = "";
 			continue;
 		}
 		
 		part += command[i];
 	}
-	output.PushBack(part);
+	if (part != "")
+		output.PushBack(part);
 }
 
 void invalidCommandMessage() {
@@ -37,13 +39,15 @@ void mainLoop(FileSystem& fs) {
 	CommandParser::Command cmd;
 	CommandParser& cmdParser = CommandParser::getInstance();
 	List<std::string> params;
+	std::string firstArg, secondArg;
 	do {
 		std::cout << "\n" << fs.currentFolderName() << "~> ";
 		std::cin.sync();
 		std::cin.clear();
 		std::cin.get(input, 100);
 		parseInput(input, params);
-		
+		if (params.IsEmpty())
+			continue;
 		cmd = cmdParser.parse(params.PopFront());
 		switch (cmd) {
 			case C::INVALID:
@@ -97,7 +101,9 @@ void mainLoop(FileSystem& fs) {
 				}
 				else {
 					try {
-						fs.rename(params.PopBack(), params.PopFront());
+						firstArg = params.PopFront();
+						secondArg = params.PopFront();
+						fs.rename(firstArg, secondArg);
 						std::cout << "Renamed successfully!";
 					}
 					catch (std::string e) {
@@ -112,11 +118,11 @@ void mainLoop(FileSystem& fs) {
 				}
 				else {
 					try {
-						std::string filePath = params.PopFront();
-						std::string data;
+						firstArg = params.PopFront();
+						secondArg = "";
 						while (!params.IsEmpty())
-							data += params.PopFront();
-						fs.appendText(filePath, data);
+							secondArg += params.PopFront();
+						fs.appendText(firstArg, secondArg);
 						std::cout << "Text appended successfully!";
 					}
 					catch (std::string ex) {
@@ -130,7 +136,9 @@ void mainLoop(FileSystem& fs) {
 				}
 				else {
 					try {
-						fs.importFile(params.PopFront(), params.PopFront());
+						firstArg = params.PopFront();
+						secondArg = params.PopFront();
+						fs.importFile(firstArg, secondArg);
 						std::cout << "Imported successfully!";
 					}
 					catch (std::string ex) {
@@ -144,7 +152,9 @@ void mainLoop(FileSystem& fs) {
 					std::cout << cmdParser.getHelp(cmd);
 				}
 				else {
-					if (fs.exportEntry(params.PopFront(), params.PopFront())) {
+					firstArg = params.PopFront();
+					secondArg = params.PopFront();
+					if (fs.exportEntry(firstArg, secondArg)) {
 						std::cout << "Export successfull!";
 					}
 					else {
@@ -172,7 +182,9 @@ void mainLoop(FileSystem& fs) {
 				}
 				else {
 					try {
-						fs.moveFile(params.Back(), params.PopFront());
+						firstArg = params.PopFront();
+						secondArg = params.PopFront();
+						fs.moveFile(firstArg, secondArg);
 						std::cout << "File moved successfully!";
 					}
 					catch (std::string ex) {
@@ -186,7 +198,9 @@ void mainLoop(FileSystem& fs) {
 				}
 				else {
 					try {
-						fs.moveFolder(params.PopBack(), params.PopFront());
+						firstArg = params.PopFront();
+						secondArg = params.PopFront();
+						fs.moveFolder(firstArg, secondArg);
 						std::cout << "Folder moved successfully!";
 					}
 					catch (std::string ex) {
@@ -200,7 +214,9 @@ void mainLoop(FileSystem& fs) {
 				}
 				else {
 					try {
-						fs.copyFile(params.PopFront(), params.PopFront());
+						firstArg = params.PopFront();
+						secondArg = params.PopFront();
+						fs.copyFile(firstArg, secondArg);
 						std::cout << "File copied successfully!";
 					}
 					catch (std::string ex) {
