@@ -81,6 +81,9 @@ Folder* Folder::getFolder(std::string name) {
 		return folders.get(name);
 	}
 	catch (const char*) {
+		if (this->name == name)
+			return this;
+
 		return nullptr;
 	}
 }
@@ -110,7 +113,7 @@ void Folder::printContents(std::ostream& out, size_t offset) const {
 	}
 }
 
-void Folder::deleteFile(std::string name) { // Optimise when making hashtable of files
+void Folder::deleteFile(std::string name) {
 	delete files.get(name);
 	files.remove(name);
 }
@@ -139,8 +142,8 @@ void Folder::deleteAllFiles(std::function<void(size_t, size_t, size_t)> delFunc)
 }
 
 void Folder::exportToFS(std::string realFSPath, std::function<void(size_t, size_t, size_t, std::string)> fileExportFN) {
-	//std::cout << "mkdir " << realFSPath << "\n";
-	system(std::string("mkdir " + realFSPath).c_str()); // OS-specific
+	
+	system(std::string("mkdir " + realFSPath).c_str()); /// OS-specific for Windows/DOS OS.
 
 	for (BST<std::string, File*>::Iterator i = files.begin(); i != files.end(); ++i) {
 		fileExportFN((*i)->getId(), (*i)->getStartPos(), (*i)->getFragmentsCount(), realFSPath + "\\" + (*i)->getName());
@@ -149,4 +152,14 @@ void Folder::exportToFS(std::string realFSPath, std::function<void(size_t, size_
 	for (BST<std::string, Folder*>::Iterator i = folders.begin(); i != folders.end(); ++i) {
 		(*i)->exportToFS(realFSPath + "\\" + (*i)->name, fileExportFN);
 	}
+}
+
+Folder* Folder::removeFolder(std::string name) {
+	Folder* f = folders.get(name);
+	folders.remove(name);
+	return f;
+}
+
+void Folder::addFolder(Folder* folder) {
+	folders.insert(folder->getName(), folder);
 }

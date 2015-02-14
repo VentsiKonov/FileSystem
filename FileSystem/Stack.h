@@ -1,10 +1,11 @@
 #pragma once
 
-// Singly linked list with just one pointer - top and no functionality to add/remove elements to back or middle.
+/// Singly linked list with just one pointer - top and no functionality to add/remove elements to back or middle.
 
 template <class T>
 class Stack {
 private:
+	/// Represents an element from the stack
 	struct Element {
 		T value;
 		Element* next;
@@ -30,12 +31,15 @@ public:
 	Stack<T>& operator=(const Stack<T>& st);
 	~Stack();
 
-
+	/// O(1) add
 	void Push(T value);
+	/// O(1) remove
 	T Pop();
+	/// O(1) access
 	T Peak() const;
 	bool Empty() const;
 	void Clean();
+	/// O(1) size -> internal variable
 	size_t Size() const;
 
 private:

@@ -3,6 +3,7 @@
 template <class T>
 class List {
 protected:
+	/// Represents an item from the list with a pointer to the next element
 	class Node {
 	public:
 		T data;
@@ -14,6 +15,7 @@ protected:
 		void operator=(const Node& n);
 	};
 public:
+	/// Iterates throught the elements of the list
 	class Iterator {
 	private:
 		Node* current;
@@ -35,23 +37,35 @@ public:
 	List<T>& operator=(const List<T>& l);
 	List(const List<T>& l);
 
+	/// O(1) add
 	void PushFront(const T data);
+	/// O(1) add
 	void PushBack(const T data);
+	/// O(n) add
 	void PushAt(size_t index, const T data);
 
+	/// O(1) remove
 	T PopFront();
+	/// O(n) remove
 	T PopBack();
+	/// O(n) remove
 	T PopAt(size_t index);
 
+	/// O(1) access
 	T& Front() const;
+	/// O(1) access
 	T& Back() const;
+	/// O(n) access to element at given position
 	T& ElementAt(size_t index) const;
 
+	/// Clears the list
 	void Clear();
 	bool IsEmpty() const;
 	size_t Size() const;
 
+	/// Pointer to first element
 	Iterator Begin() const;
+	/// Represents blank list (end of list)
 	Iterator End() const;
 
 protected:
@@ -60,6 +74,7 @@ protected:
 	size_t size;
 
 	void CopyFrom(const List<T>& l);
+	/// Gets the node at given position
 	Node* GetNode(size_t index) const;
 };
 

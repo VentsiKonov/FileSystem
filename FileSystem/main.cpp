@@ -4,6 +4,7 @@
 #include "List.hpp"
 #include "BST.hpp"
 
+/// Parse a string with command and parameters as a list of strings
 void parseInput(const char command[], List<std::string>& output) {
 	size_t length = strlen(command);
 	std::string part;
@@ -23,14 +24,15 @@ void invalidCommandMessage() {
 	std::cout << "Type 'help' for list of commands\n";
 }
 
+/// The main working loop of out filesystem
 void mainLoop(FileSystem& fs) {
 	typedef CommandParser::Command C;
-	char input[100];
+	char input[100]; // We assume excesive names will not be given + we don't support piping commands so 100 should be enough.
 	CommandParser::Command cmd;
 	CommandParser& cmdParser = CommandParser::getInstance();
 	List<std::string> params;
 	do {
-		std::cout << "\n~root> ";
+		std::cout << "\n" << fs.currentFolderName() << "~> ";
 		std::cin.sync();
 		std::cin.clear();
 		std::cin.get(input, 100);
@@ -144,6 +146,62 @@ void mainLoop(FileSystem& fs) {
 					}
 				}
 				break;
+
+			case C::info:
+				if (params.IsEmpty()) {
+					std::cout << cmdParser.getHelp(cmd);
+				}
+				else {
+					try {
+						fs.printEntryInfo(params.PopFront(), std::cout);
+					}
+					catch (std::string ex) {
+						std::cout << ex;
+					}
+				}
+				break;
+			case C::movef:
+				if (params.Size() < 2) {
+					std::cout << cmdParser.getHelp(cmd);
+				}
+				else {
+					try {
+						fs.moveFile(params.Back(), params.PopFront());
+						std::cout << "File moved successfully!";
+					}
+					catch (std::string ex) {
+						std::cout << ex;
+					}
+				}
+				break;
+			case C::moved:
+				if (params.Size() < 2) {
+					std::cout << cmdParser.getHelp(cmd);
+				}
+				else {
+					try {
+						fs.moveFolder(params.PopBack(), params.PopFront());
+						std::cout << "Folder moved successfully!";
+					}
+					catch (std::string ex) {
+						std::cout << ex;
+					}
+				}
+				break;
+			case C::copy:
+				if (params.Size() < 2) {
+					std::cout << cmdParser.getHelp(cmd);
+				}
+				else {
+					try {
+						fs.copyFile(params.PopFront(), params.PopFront());
+						std::cout << "File copied successfully!";
+					}
+					catch (std::string ex) {
+						std::cout << ex;
+					}
+				}
+				break;
 			case C::structure:
 				fs.printStructure(std::cout);
 				break;
@@ -164,12 +222,11 @@ int main() {
 			std::cin.getline(input, 100);
 			FileSystem fs(input);
 			activeMode = true;
-			//fs.printStructure(std::cout);
 			mainLoop(fs);
 	
 		}
-		catch (std::exception ex) {
-			std::cout << ex.what() << "\n";
+		catch (std::string ex) {
+			std::cout << ex << "\n";
 			activeMode = false;
 		}
 	}

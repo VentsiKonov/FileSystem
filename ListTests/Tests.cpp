@@ -61,6 +61,13 @@ namespace DataStructuresTests
 			}
 		}
 
+		TEST_METHOD(LIST_TestPop) {
+			List<int> list;
+			list.PushBack(1);
+			list.PushBack(2);
+			Assert::AreEqual(2, list.PopBack());
+		}
+
 	};
 
 	TEST_CLASS(HashTableTests) {

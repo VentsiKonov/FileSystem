@@ -24,9 +24,10 @@ void File::copyFrom(const File& other) {
 }
 
 void File::getInfo(std::ostream& out, size_t fragmentSize) {
+	/// The size o one fragments is unkown by the file, so it is passed as a parameter.
 	Entry::getInfo(out);
 	out << '\n';
-	out << "\tSize: " << fragmentsCount * 32 << " bytes.";
+	out << "\tSize on disk: " << fragmentsCount * fragmentSize << " bytes.";
 }
 
 void File::saveToFile(std::ostream& file) const{

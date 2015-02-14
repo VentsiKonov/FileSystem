@@ -1,26 +1,35 @@
 #pragma once
 #include "List.hpp"
 #include <iostream>
+/// HashTable with dynamic array of Lists as buckets 
 template <class T, class G>
 class HashTable {
 public:
+	/// hashing function of one argument of type T returning size_t. Used to decide in which bucket an element should be appended. 
 	HashTable(size_t (*hashFN)(T), size_t bucketsCount = 10);
 	HashTable(const HashTable<T, G> &other);
 	HashTable<T, G>& operator=(const HashTable<T, G> &other);
 	~HashTable();
 
+	/// O(k) checkup where k is the number of elements in the bucket. Hashing time is not calculated. No-throw guarantee.
 	bool contains(const T& key) const;
+	/// O(k) access where k is the number of elements in the bucket. Hashing time is not calculated. Throws const char* 
 	G get(const T& key) const;
+	/// O(k) removal where k is the number of elements in the bucket. Hashing time is not calculated. Throws const char*
 	G remove(const T& key);
+	/// O(1) add
 	void put(const T& key, const G& value);
+	/// O(1) size check
 	size_t size() const;
 
 private:
+	/// Represents a key:value pair
 	struct Entry {
 		T key;
 		G value;
 	};
 
+	/// Pointer to hashing function
 	size_t (*hashFN)(T);
 	size_t bucketsCount;
 	List<Entry>* buckets;

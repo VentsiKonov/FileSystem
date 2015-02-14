@@ -1,8 +1,10 @@
 #pragma once
 #include "Stack.h"
+/// Binary Search Tree
 template <class KEY, class VALUE>
 class BST {
 private:
+	/// Represents one tree node. Left subtree contains element with smaller key value than the current node's key. Right subtree - with a greater key value. 
 	struct Node {
 		Node(const KEY& key, const VALUE& value);
 		Node& operator=(const Node& other);
@@ -12,6 +14,7 @@ private:
 		void insert(const KEY& key, const VALUE& value);
 		VALUE get(const KEY& key) const;
 		Node* remove(const KEY& key, Node* parent);
+		/// Finds the minimal element in the subtree
 		Node* minElement();
 
 		Node* left;
@@ -22,6 +25,7 @@ private:
 		void copyFrom(const Node& other);
 	};
 public:
+	/// Uses a stack to iterate through the elements with depth-first
 	class Iterator {
 	public:
 		Iterator(Node* current);
@@ -31,6 +35,7 @@ public:
 		Iterator& operator++();
 		bool operator==(const Iterator& other) const;
 		bool operator!=(const Iterator& other) const;
+		/// Dereference to the current value given by reference
 		VALUE& operator*() const;
 	private:
 
@@ -41,12 +46,17 @@ public:
 	BST(const BST<KEY, VALUE>& other);
 	BST& operator= (const BST<KEY, VALUE>& other);
 	~BST();
-
+	/// Inserts a key-value pair in the tree. Throws (const char*) if the key already exists in the tree.
 	void insert(const KEY& key, const VALUE& value);
+	/// Returns the value associated with given key. Throws (const char*) if the key does not exist.
 	VALUE get(const KEY& key) const;
+	/// Removes an entry from the tree. No-throw guarantee.
 	void remove(const KEY& key);
+	/// Number of elements currently in the tree.
 	size_t size() const;
+	/// Iterator to the root of the tree.
 	Iterator begin() const;
+	/// Iterator representing a blank tree.
 	Iterator end() const;
 
 private:

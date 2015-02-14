@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <fstream>
+/// A parent class used for polymorphism with File and Folder classes as they share some functionality
 class Entry {
 public:
 	Entry(std::string name) : name(name) {}
