@@ -5,12 +5,9 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FileSystem", "FileSystem\FileSystem.vcxproj", "{43FCCB33-155A-419C-81F4-2CA19B89073A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ListTests", "ListTests\ListTests.vcxproj", "{7889097C-030F-4DF3-A702-F4915C981AC6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DataStructuresTests", "ListTests\ListTests.vcxproj", "{7889097C-030F-4DF3-A702-F4915C981AC6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F26F70C8-63D3-4DAC-B9A8-8FBFB6458FAD}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,8 +26,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
